@@ -1,0 +1,37 @@
+{
+  "name": "rs_mapper_browser",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@msgpack/msgpack": "^3.0.0-beta2",
+    "@ygoe/msgpack": "^1.0.3",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "caniuse-lite": "^1.0.30001579",
+    "dials_javascript_parser": "github:toastisme/dials_javascript_parser",
+    "fs": "^0.0.1-security",
+    "gh-pages": "^5.0.0",
+    "gsap": "^3.11.5",
+    "marching-cubes-fast": "^0.0.172",
+    "msgpack-js-browser": "^0.1.4",
+    "msgpack-lite": "^0.1.26",
+    "msgpack5": "^6.0.2",
+    "msgpackr": "^1.9.1",
+    "three": "^0.172.0",
+    "three.meshline": "^1.4.0"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "buffer": "^5.7.1",
+    "events": "^3.3.0",
+    "process": "^0.11.10",
+    "util": "^0.12.5"
+  }
+}
