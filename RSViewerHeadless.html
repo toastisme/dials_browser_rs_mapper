@@ -34,12 +34,9 @@
 		<b>right click</b> = reset view <br>
 		<b>mouse wheel</b> = zoom<br>
 		----------------------------------<br>
-		<span style="color: #96f97b"><b>foreground</b> </span><input type="checkbox" 
-		id="foreground" disabled
-		onclick="updateForeground()", ><br>
-		<span style="color: #6a7688"><b>background:</b> </span><input type="checkbox" 
-		id="background" disabled
-		onclick="updateBackground()", ><br>
+		<b>Threshold</b>  <input type="range" min="0" max="1" value=".5" step="0.001" 
+		class="slider" id="meshThresholdSlider" 
+		onmouseup="window.viewer.updateMesh()"><br><br>
 	</sidebar>
 	<footer id="footerText"> </footer>
 		<style>

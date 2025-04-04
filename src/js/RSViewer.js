@@ -10,11 +10,12 @@ export class RSViewer {
   constructor(exptParser,colors = null) {
 
     this.expt = exptParser;
+    this.meshData = null;
+    this.meshShape = null;
     this.beamMeshes = [];
     this.sampleMesh = null;
     this.serverWS = null;
     this.minIntensityValue = 0.0;
-    this.contor
 
     this.colors = null;
     if (colors != null) {
@@ -223,8 +224,24 @@ export class RSViewer {
     };
   }
 
-  addContourMeshFromData(data, meshShape, isovalue = .5) {
+  updateMesh(){
+    if (this.meshData === null || this.meshShape === null){
+      return;
+    }
+    const meshData = this.meshData;
+    const meshShape = this.meshShape;
+    this.clearMesh();
+    this.addContourMeshFromData(meshData, meshShape);
+
+  }
+
+  addContourMeshFromData(data, meshShape) {
+    this.meshData = data;
+    this.meshShape = meshShape;
+
+    const isovalue = document.getElementById("meshThresholdSlider").value;
     this.loading=true;
+    this.meshD
       data = ExptParser.decompressImageData(data, meshShape);
       const sdf = this.createSignedDistanceFunction(data, meshShape, isovalue);
 
@@ -242,6 +259,7 @@ export class RSViewer {
       geometry.setIndex(new THREE.BufferAttribute(indices, 1));
       geometry.computeVertexNormals();
       geometry.computeBoundingBox();
+      geometry.center();
 
       /*
       const material = new THREE.MeshStandardMaterial({
@@ -375,14 +393,16 @@ export class RSViewer {
       window.scene.remove(this.currentMesh);
       this.currentMesh.geometry.dispose();
       this.currentMesh.material.dispose();
-      this.currentMesh = null;
       if (this.currentMesh.isInstancedMesh) {
           this.currentMesh.count = 0;
           this.currentMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
           this.currentMesh.instanceMatrix.needsUpdate = true;
       }
+      this.currentMesh = null;
     }
 
+    this.meshData = null;
+    this.meshShape = null;
     this.clearAxes();
     this.requestRender();
   }
