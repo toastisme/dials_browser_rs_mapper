@@ -34,9 +34,12 @@
 		<b>right click</b> = reset view <br>
 		<b>mouse wheel</b> = zoom<br>
 		----------------------------------<br>
-		<b>Threshold</b>  <input type="range" min="0" max="1" value=".5" step="0.001" 
+		<b>Threshold</b>  <input type="range" min=".1" max="1" value=".5" step="0.001" 
 		class="slider" id="meshThresholdSlider" 
 		onmouseup="window.viewer.updateMesh()"><br><br>
+		<b>Max Resolution (A)</b>  <input type="range" min="1" max="15" value="6" step="0.001" 
+		class="slider" id="maxResolutionSlider" 
+		onmouseup="window.viewer.updateMaxResolution()"><br><br>
 	</sidebar>
 	<footer id="footerText"> </footer>
 		<style>
@@ -129,7 +132,10 @@
 			case "update_mesh":
 				window.viewer.addContourMeshFromData(
 				msg["mesh_data"],
-				msg["mesh_dimensions"]
+				msg["mesh_dimensions"],
+				msg["rlp_min"],
+				msg["rlp_max"],
+				msg["rlp_step"]
 				);
 				break;
 			default:

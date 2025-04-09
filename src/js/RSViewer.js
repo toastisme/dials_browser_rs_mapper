@@ -12,6 +12,9 @@ export class RSViewer {
     this.expt = exptParser;
     this.meshData = null;
     this.meshShape = null;
+    this.rLPMin = null;
+    this.rLPMax = null;
+    this.rLPStep = null;
     this.beamMeshes = [];
     this.sampleMesh = null;
     this.serverWS = null;
@@ -61,7 +64,7 @@ export class RSViewer {
     return {
       "beamLength": 800.,
       "sample": 1,
-      "meshScaleFactor" : 10.,
+      "meshScaleFactor" : 1000.,
     };
   }
 
@@ -216,57 +219,78 @@ export class RSViewer {
         let xi = Math.floor(x);
         let yi = Math.floor(y);
         let zi = Math.floor(z);
-        
         if (xi < 0 || yi < 0 || zi < 0 || xi >= meshShape[0] || yi >= meshShape[1] || zi >= meshShape[2]) {
-            return -1; // Outside the volume
+            return -1; 
         }
-        return meshData[zi][yi][xi] - isovalue; // Centering around isovalue
+        return meshData[zi][yi][xi] - isovalue; 
     };
+
+  }
+
+  updateMaxResolution(){
+    this.clearMesh();
+    const resolution = document.getElementById("maxResolutionSlider").value;
+		const data = JSON.stringify(
+				{
+					"channel" : "server",
+					"command" : "update_rs_mapper_mesh",
+					"max_resolution" : resolution
+				}
+			);
+		this.serverWS.send(data);
+
   }
 
   updateMesh(){
     if (this.meshData === null || this.meshShape === null){
       return;
     }
+    if (this.rLPMin === null || this.rLPMax === null || this.rLPStep === null){
+      return;
+    }
     const meshData = this.meshData;
     const meshShape = this.meshShape;
+    const rLPMin = this.rLPMin;
+    const rLPMax = this.rLPMax;
+    const rLPStep = this.rLPStep;
     this.clearMesh();
-    this.addContourMeshFromData(meshData, meshShape);
+    this.addContourMeshFromData(meshData, meshShape, rLPMin, rLPMax, rLPStep);
 
   }
 
-  addContourMeshFromData(data, meshShape) {
+  addContourMeshFromData(data, meshShape, rLPMin, rLPMax, rLPStep) {
     this.meshData = data;
     this.meshShape = meshShape;
+    this.rLPMin = rLPMin;
+    this.rLPMax = rLPMax;
+    this.rLPStep = rLPStep;
 
     const isovalue = document.getElementById("meshThresholdSlider").value;
     this.loading=true;
-    this.meshD
       data = ExptParser.decompressImageData(data, meshShape);
       const sdf = this.createSignedDistanceFunction(data, meshShape, isovalue);
 
       const resolution = 64;
-      const scanBounds = [[0, 0, 0], [meshShape[0], meshShape[1], meshShape[2]]];
+      const scanBounds = [[0,0,0], [meshShape[0], meshShape[1], meshShape[2]]];
 
-      // Generate the mesh using Marching Cubes
       const result = marchingCubes(resolution, sdf, scanBounds);
+      const positions = result.positions;
+      const meshScaleFactor = RSViewer.sizes()["meshScaleFactor"];
 
+      for (let i = 0; i < positions.length; i++){
+        positions[i][0] = ((positions[i][0] - meshShape[0]/2) * rLPStep) * meshScaleFactor;
+        positions[i][1] = ((positions[i][1] - meshShape[1]/2) * rLPStep) * meshScaleFactor;
+        positions[i][2] = ((positions[i][2] - meshShape[2]/2) * rLPStep) * meshScaleFactor;
+      }
+
+      const vertices = new Float32Array(positions.flat());
       const geometry = new THREE.BufferGeometry();
-      const vertices = new Float32Array(result.positions.flat());
       const indices = new Uint32Array(result.cells.flat());
 
       geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
       geometry.setIndex(new THREE.BufferAttribute(indices, 1));
       geometry.computeVertexNormals();
       geometry.computeBoundingBox();
-      geometry.center();
-
-      /*
-      const material = new THREE.MeshStandardMaterial({
-          color: 0xFFFFFF,
-          transparent: false,
-      });
-      */
 
       const material = new THREE.MeshBasicMaterial({
       color: 0xFFFFFF,
@@ -275,8 +299,6 @@ export class RSViewer {
 
 
       const contourMesh = new THREE.Mesh(geometry, material);
-      const meshScaleFactor = RSViewer.sizes()["meshScaleFactor"];
-      contourMesh.scale.set(meshScaleFactor, meshScaleFactor, meshScaleFactor);
       window.scene.add(contourMesh);
       this.currentMesh = contourMesh;
       this.requestRender();
@@ -403,6 +425,9 @@ export class RSViewer {
 
     this.meshData = null;
     this.meshShape = null;
+    this.rLPMin = null;
+    this.rLPMax = null;
+    this.rLPStep = null;
     this.clearAxes();
     this.requestRender();
   }
