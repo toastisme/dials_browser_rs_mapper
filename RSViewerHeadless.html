@@ -16,15 +16,30 @@
 	<sidebar id="sidebar"> 
 		<script>
 			// Wrapper functions to prevent mouse events triggering underneath sidebar
-
-			function updateForeground(){
+			function updateMaxResolution(){
 				window.viewer.disableMouseClick(); 
-				window.viewer.updateForeground()
+				window.viewer.updateMaxResolution();
 			}
 
-			function updateBackground(){
+			function updateMaxResolutionValue(){
 				window.viewer.disableMouseClick(); 
-				window.viewer.updateBackground()
+				var maxResolutionSlider = document.getElementById("maxResolutionSlider");
+  				var maxResolutionValue = document.getElementById("maxResolutionValue");
+  				maxResolutionValue.innerHTML = maxResolutionSlider.value + " Å";
+				window.viewer.requestRender();
+			}
+
+			function updateMesh(){
+				window.viewer.disableMouseClick(); 
+				window.viewer.updateMesh();
+			}
+
+			function updateThresholdValue(){
+				window.viewer.disableMouseClick(); 
+				var meshThresholdSlider = document.getElementById("meshThresholdSlider");
+  				var meshThresholdValue = document.getElementById("meshThresholdValue");
+  				meshThresholdValue.innerHTML = meshThresholdSlider.value;
+				window.viewer.requestRender();
 			}
 
 
@@ -36,13 +51,17 @@
 		----------------------------------<br>
 		<b>Threshold</b>  <input type="range" min=".1" max="1" value=".5" step="0.001" 
 		class="slider" id="meshThresholdSlider" 
-		onmouseup="window.viewer.updateMesh()"><br><br>
+		onmouseup="updateMesh()" onmousemove="updateThresholdValue()"><span id="meshThresholdValue"></span><br><br>
 		<b>Max Resolution (A)</b>  <input type="range" min="1" max="15" value="6" step="0.001" 
 		class="slider" id="maxResolutionSlider" 
-		onmouseup="window.viewer.updateMaxResolution()"><br><br>
+		onmouseup="updateMaxResolution()" onmousemove="updateMaxResolutionValue()"><span id="maxResolutionValue"></span><br><br>
 	</sidebar>
 	<footer id="footerText"> </footer>
 		<style>
+		.slider {
+			margin-top: 0px; /* Adjust this value as needed */
+			vertical-align: middle;
+		}
 
 		.show {display: block;}
 		#sidebar {
