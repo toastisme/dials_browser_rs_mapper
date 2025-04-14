@@ -277,10 +277,15 @@ export class RSViewer {
       const positions = result.positions;
       const meshScaleFactor = RSViewer.sizes()["meshScaleFactor"];
 
-      for (let i = 0; i < positions.length; i++){
-        positions[i][0] = ((positions[i][0] - meshShape[0]/2) * rLPStep) * meshScaleFactor;
-        positions[i][1] = ((positions[i][1] - meshShape[1]/2) * rLPStep) * meshScaleFactor;
-        positions[i][2] = ((positions[i][2] - meshShape[2]/2) * rLPStep) * meshScaleFactor;
+      for (let i = 0; i < positions.length; i++) {
+        const x = positions[i][0];
+        const y = positions[i][1];
+        const z = positions[i][2];
+
+        // Reassign in z, y, x order
+        positions[i][0] = ((z - meshShape[2] / 2) * rLPStep) * meshScaleFactor; 
+        positions[i][1] = ((y - meshShape[1] / 2) * rLPStep) * meshScaleFactor; 
+        positions[i][2] = ((x - meshShape[0] / 2) * rLPStep) * meshScaleFactor; 
       }
 
       const vertices = new Float32Array(positions.flat());
